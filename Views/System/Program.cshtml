@@ -1,0 +1,167 @@
+﻿@model CULCS.DTO.SearchDTO
+@using CULCS.Extensions;
+@{
+    ViewData["Title"] = "โปรแกรม";
+}
+
+<div class="container-fluid">
+    <!-- Page-Title -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div aria-live="polite" aria-atomic="true" style="position: relative;">
+                <div class="page-title-box">
+                    <div class="float-right">
+                    </div>
+                    <h4 class="page-title">โปรแกรม</h4>
+                    <p class="text-muted">
+                        Program
+                    </p>
+                </div><!--end page-title-box-->
+                @if (ViewBag.ReturnCode != null)
+                {
+                    <div style="position: absolute; top: 10px; right: 0;">
+                        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true" data-toggle="toast">
+                            <div class="toast-header">
+                                <i class="mdi mdi-circle-slice-8 font-18 mr-1 @(ViewBag.ReturnCode  == ReturnCode.Success ? "text-success" : "text-danger")"></i>
+                                <strong class="mr-auto">@ViewBag.Message</strong>
+                                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div> <!--end toast-->
+                    </div>
+                }
+            </div>
+        </div><!--end col-->
+    </div>
+    <!--end row-->
+
+    <form class="form-horizontal form-parsley" asp-action="Program" asp-controller="System">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col-lg-12 text-right">
+                                <label class="col-form-label"><br /></label>
+                                <a class="btn btn-success" href="@Url.Action("ProgramInfo","System")"><span><i class="fas fa-plus"></i> เพิ่มโปรแกรม</span></a>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-12">
+                                <div class="table-rep-plugin">
+                                    <div class="table-responsive mb-0" data-pattern="priority-columns">
+                                        <table id="tech-companies-1" class="table table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Azure Group</th>
+                                                    <th>ชื่อโปรแกรม</th>
+                                                    <th>โดเมน</th>
+                                                    <th>ระยะเวลาสูงสุดในการยืม</th>
+                                                    <th>วันที่สร้าง</th>
+                                                    <th>สถานะ</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (ProgramLicense item in Model.lists)
+                                                {
+                                                    <tr>
+                                                        <td>@item.AzureGroup.GroupName</td>
+                                                        <td>@item.ProgramName</td>
+                                                        <td>
+                                                            @if (item.ChulaDomain)
+                                                            {
+                                                                @("Chula.ac.th")
+                                                                <br />
+                                                            }
+                                                            @if (item.StudentChulaDomain)
+                                                            {
+                                                                @("Student.chula.ac.th")
+                                                                <br />
+                                                            }
+                                                            @if (item.AlumniChulaDomain)
+                                                            {
+                                                                @("Alumni.chula.ac.th")
+                                                                <br />
+                                                            }
+                                                        </td>
+                                                        <td>@item.MaxBorrow @item.PeriodType</td>
+                                                        <td>@DateUtil.ToDisplayDate(item.Create_On)</td>
+                                                        <td>
+                                                            @item.Status.toStatusName()
+                                                        </td>
+                                                        <td>
+                                                            <a href="@Url.Action("ProgramInfo", "System", new { id=item.ID})"><i class="fas fa-edit text-primary font-16"></i></a>
+                                                            <a href="@Url.Action("ProgramDel", "System", new { id=item.ID})" onclick="return confirm('ต้องการลบรายการนี้?')"><i class="fas fa-trash-alt text-danger font-16"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.lists.Count() == 0)
+                                                {
+                                                    <tr>
+                                                        <td colspan="6" class="text-center">ไม่พบข้อมูล</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div> <!-- end card-body -->
+                </div> <!-- end card -->
+            </div> <!-- end col -->
+            <!-- end col -->
+        </div>
+    </form>
+    <!-- end row -->
+
+</div><!-- container -->
+@section scripts{
+    <script>
+        function rolecheck(id) {
+            $.ajax({
+               type: 'get',
+               url: '@Url.Action("CheckOU", "System")?id='+ id,
+               contentType: 'application/json; charset=utf-8',
+               dataType: 'json',
+                success: function (data) {
+                    var html = '';
+                   if (data["result"] == '@((int)ReturnCode.Success)') {
+                       if (data["names"] != null) {
+                           for (var i=0; i < data["names"].length; i++) {
+                               var name = data["names"][i];
+                               html += '<p>'+name+'</p>';
+                           }
+                       }
+                   }
+                    $('#divbody').html(html);
+                    $('#myModal').modal('show');
+               }
+           });
+        }
+    </script>
+}
+<div class="modal fade bs-example-modal-center" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="exampleModalLabel">สิทธิ์</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="divbody">
+                <p>
+                    ผู้ดูแลระบบ บางเขน
+                </p>
+                <p>
+                    ผู้ดูแลระบบ เขียงราย
+                </p>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>

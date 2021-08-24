@@ -1,0 +1,125 @@
+﻿@model CULCS.Models.Admin
+@{
+    ViewData["Title"] = "ผู้ดูแลระบบ";
+
+}
+<div class="container-fluid">
+    <!-- Page-Title -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div aria-live="polite" aria-atomic="true" style="position: relative;">
+                <div class="page-title-box">
+                    <div class="float-right">
+                    </div>
+                    <h4 class="page-title">ผู้ดูแลระบบ</h4>
+                    <p class="text-muted">
+                        Admin
+                    </p>
+                </div><!--end page-title-box-->
+                @if (ViewBag.ReturnCode != null)
+                {
+                    <div style="position: absolute; top: 10px; right: 0;">
+                        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true" data-toggle="toast">
+                            <div class="toast-header">
+                                <i class="mdi mdi-circle-slice-8 font-18 mr-1 @(ViewBag.ReturnCode  == ReturnCode.Success ? "text-success" : "text-danger")"></i>
+                                <strong class="mr-auto">@ViewBag.Message</strong>
+                                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div> <!--end toast-->
+                    </div>
+                }
+            </div>
+        </div><!--end col-->
+    </div>
+    <!-- end page title end breadcrumb -->
+    <!--end row-->
+    <form class="form-horizontal form-parsley" novalidate role="form" asp-action="AdminInfo" asp-controller="System">
+        @Html.HiddenFor(m => m.ID)
+        @Html.HiddenFor(m => m.UserID)
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body mt-3">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">รหัสผู้ใช้</label>
+                                    <div class="col-sm-8">
+                                        @if (Model.ID == 0)
+                                        {
+                                            <input class="form-control" type="text" asp-for="AdminCode" required>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" type="text" asp-for="AdminCode" readonly>
+                                        }
+                                        @Html.ValidationMessageFor(m => m.AdminCode)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">ชื่อ</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="text" asp-for="FirstName" required>
+                                        @Html.ValidationMessageFor(m => m.FirstName)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">นามสกุล</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="text" asp-for="LastName" required>
+                                        @Html.ValidationMessageFor(m => m.LastName)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @if (Model.ID == 0)
+                        {
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label text-right">รหัสผ่านใหม่</label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" type="password" asp-for="Password" required>
+                                            @Html.ValidationMessageFor(m => m.Password)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label text-right">ยืนยันรหัสผ่าน</label>
+                                        <div class="col-sm-8">
+                                            <input class="form-control" type="password" asp-for="ConfirmPassword" required data-parsley-equalto="#Password">
+                                            @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }                      
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right"></label>
+                                    <div class="col-sm-8">
+                                        <button class="btn btn-primary " type="submit">บันทึก</button>
+                                        <a href="@Url.Action("Admin","System")" class="btn btn-light">กลับ</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- end card-body -->
+                </div> <!-- end card -->
+            </div> <!-- end col -->
+            <!-- end col -->
+        </div> <!-- end row -->
+    </form>
+
+
+</div><!-- container -->

@@ -1,0 +1,194 @@
+﻿@inject CULCS.Services.LoginServices loginServices
+@using CULCS.Extensions;
+@model CULCS.DTO.SearchDTO
+@{
+    ViewData["Title"] = "History";
+
+    var program_search = "";
+    if (Model.program_search.HasValue)
+    {
+        program_search = Model.program_search.Value.ToString();
+    }
+}
+
+<div class="container-fluid">
+    <!-- Page-Title -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div aria-live="polite" aria-atomic="true" style="position: relative;">
+                <div class="page-title-box">
+                    <div class="float-right">
+                    </div>
+                    <h4 class="page-title">History</h4>
+                    <p class="text-muted">
+                        History
+                    </p>
+                </div><!--end page-title-box-->
+                @if (ViewBag.ReturnCode != null)
+                {
+                    <div style="position: absolute; top: 10px; right: 0;">
+                        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true" data-toggle="toast">
+                            <div class="toast-header">
+                                <i class="mdi mdi-circle-slice-8 font-18 mr-1 @(ViewBag.ReturnCode  == ReturnCode.Success ? "text-success" : "text-danger")"></i>
+                                <strong class="mr-auto">@ViewBag.Message</strong>
+                                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div> <!--end toast-->
+                    </div>
+                }
+            </div>
+        </div><!--end col-->
+    </div>
+    <!--end row-->
+
+    <form class="form-horizontal form-parsley" asp-action="Index" asp-controller="Home">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        @if (loginServices.UserRole() == UserType.SuperAdmin.toUserTypeName() | loginServices.UserRole() == UserType.Admin.toUserTypeName())
+                        {
+                            <h4 class="mt-0 header-title">Search</h4>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <label class="col-form-label">Text Search</label>
+                                    <input class="form-control" asp-for="text_search" type="text" placeholder="Email">
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="col-form-label">Date from</label>
+                                    <input type="text" class="form-control dpicker" asp-for="dfrom">
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="col-form-label">Date to</label>
+                                    <input type="text" class="form-control dpicker" asp-for="dto">
+                                </div>
+
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-lg-3">
+                                    <label class="col-form-label">Domain</label>
+                                    <select class="form-control" asp-for="domain_search" asp-items="@(ViewBag.ListDomain)" onchange="DomainOnchange(this)" relatedto="program_search">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label class="col-form-label">Program</label>
+                                    <select class="form-control" asp-for="program_search">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="col-form-label">Status</label>
+                                    <select class="form-control" asp-for="borrow_status_search">
+                                        <option value=""></option>
+                                        <option value="@BorrowStatus.Advance">@BorrowStatus.Advance.toBorrowStatusName()</option>
+                                        <option value="@BorrowStatus.Borrowing">@BorrowStatus.Borrowing.toBorrowStatusName()</option>
+                                        <option value="@BorrowStatus.Returned">@BorrowStatus.Returned.toBorrowStatusName()</option>
+                                        <option value="@BorrowStatus.Cancelled">@BorrowStatus.Cancelled.toBorrowStatusName()</option>
+                                        <option value="@BorrowStatus.Expired">@BorrowStatus.Expired.toBorrowStatusName()</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+
+                                </div>
+                                <div class="col-lg-1">
+                                    <label class="col-form-label"><br /></label>
+                                    <button class="btn btn-primary btn-block" type="submit">Search</button>
+                                </div>
+
+                            </div>
+                        }
+                        <div class="form-group row">
+                            <div class="col-lg-12">
+                                <div class="table-rep-plugin">
+                                    <div class="table-responsive mb-0" data-pattern="priority-columns">
+                                        <table id="tech-companies-1" class="table table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Domain</th>
+                                                    <th>Program</th>
+                                                    <th>Borrower</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (Borrow item in Model.lists)
+                                                {
+                                                    <tr>
+                                                        <td>@DateUtil.ToDisplayDate(item.BorrowDate)</td>
+                                                        <td>@DateUtil.ToDisplayDate(item.ExpiryDate)</td>
+                                                        <td>@item.Domain</td>
+                                                        <td>@item.ProgramLicense.ProgramName</td>
+                                                        <td>@item.UserPrincipalName</td>
+                                                        <td>@item.BorrowStatus.toBorrowStatusName()</td>
+                                                    </tr>
+                                                }
+                                                @if (Model.lists.Count() == 0)
+                                                {
+                                                    <tr>
+                                                        <td colspan="6" class="text-center">Data has not found</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    @if (Model.lists.Count() > 0)
+                                    {
+                                        <div class="table-pagination">
+                                            <div class="btn-group">
+                                                @for (var i = 1; i <= Model.pagelen; i++)
+                                                {
+                                                    <a href="@Url.Action("Index", "Home", new { pageno = i, text_search = Model.text_search, dfrom = Model.dfrom, dto = Model.dto, domain_search = Model.domain_search, program_search = Model.program_search, borrow_status_search = Model.borrow_status_search })" class="btn btn-outline-secondary @(Model.pageno == i ? "active" : "")">@i</a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div> <!-- end card-body -->
+                </div> <!-- end card -->
+            </div> <!-- end col -->
+            <!-- end col -->
+        </div>
+    </form>
+    <!-- end row -->
+
+</div><!-- container -->
+@section scripts{
+    <script>
+        $(document).ready(function () {
+          if ($('#domain_search').val() != null)
+            DomainOnchange(document.getElementById("domain_search"));
+      });
+        function DomainOnchange(obj) {
+            var programID = '@program_search';
+           if (obj.attributes.relatedto == null)
+               return;
+           $.ajax({
+               type: 'get',
+               url: '@Url.Action("LoadProgram", "Home")',
+               contentType: 'application/json; charset=utf-8',
+               data: { domain: obj.value },
+               dataType: 'json',
+               success: function (data) {
+                   var relatedto = obj.attributes.relatedto.value;
+                   var result = '<option value=""></option>';
+                   for (var i = 0, iL = data.length; i < iL; i++) {
+                       if (programID == data[i].value)
+                           result += '<option selected value="' + data[i].value + '">' + data[i].text + '</option>';
+                       else
+                           result += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                   }
+                   $('#' + relatedto).html(result);
+               }
+           });
+       }
+    </script>
+}

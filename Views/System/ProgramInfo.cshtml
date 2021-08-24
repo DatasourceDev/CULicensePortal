@@ -1,0 +1,186 @@
+﻿@model CULCS.Models.ProgramLicense
+@{
+    ViewData["Title"] = "โปรแกรม";
+
+}
+<div class="container-fluid">
+    <!-- Page-Title -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div aria-live="polite" aria-atomic="true" style="position: relative;">
+                <div class="page-title-box">
+                    <div class="float-right">
+                    </div>
+                    <h4 class="page-title">โปรแกรม</h4>
+                    <p class="text-muted">
+                        Program
+                    </p>
+                </div><!--end page-title-box-->
+                @if (ViewBag.ReturnCode != null)
+                {
+                    <div style="position: absolute; top: 10px; right: 0;">
+                        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true" data-toggle="toast">
+                            <div class="toast-header">
+                                <i class="mdi mdi-circle-slice-8 font-18 mr-1 @(ViewBag.ReturnCode  == ReturnCode.Success ? "text-success" : "text-danger")"></i>
+                                <strong class="mr-auto">@ViewBag.Message</strong>
+                                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div> <!--end toast-->
+                    </div>
+                }
+            </div>
+        </div><!--end col-->
+    </div>
+    <!-- end page title end breadcrumb -->
+    <!--end row-->
+    <form class="form-horizontal form-parsley" novalidate role="form" asp-action="ProgramInfo" asp-controller="System">
+        @Html.HiddenFor(m => m.ID)
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body mt-3">
+                        @if (Model.ID > 0)
+                        {
+                            @Html.HiddenFor(m => m.AzureGroupID)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label text-right">Azure Group</label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" asp-for="AzureGroupID" asp-items="@(ViewBag.ListGroup)" disabled></select>
+                                            @Html.ValidationMessageFor(m => m.AzureGroupID)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label text-right">Azure Group</label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" asp-for="AzureGroupID" asp-items="@(ViewBag.ListGroup)"></select>
+                                            @Html.ValidationMessageFor(m => m.AzureGroupID)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">ชื่อโปรแกรม</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="text" asp-for="ProgramName">
+                                        @Html.ValidationMessageFor(m => m.ProgramName)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">โดเมน</label>
+                                    <div class="col-sm-8 mt-2">
+                                        <div class="checkbox checkbox-primary">
+                                            <input type="checkbox" asp-for="ChulaDomain">
+                                            <label for="ChulaDomain">
+                                                Chula.ac.th
+                                            </label>
+                                        </div>
+                                        <div class="checkbox checkbox-primary">
+                                            <input type="checkbox" asp-for="StudentChulaDomain">
+                                            <label for="StudentChulaDomain">
+                                                Student.chula.ac.th
+                                            </label>
+                                        </div>
+                                        <div class="checkbox checkbox-primary">
+                                            <input type="checkbox" asp-for="AlumniChulaDomain">
+                                            <label for="AlumniChulaDomain">
+                                                Alumni.chula.ac.th
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">ระยะเวลาสูงสุดในการยืมล่วงหน้า</label>
+                                    <div class="col-sm-8">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input class="form-control" type="text" asp-for="MaxBorrowAdvance" >
+                                                @Html.ValidationMessageFor(m => m.MaxBorrowAdvance)
+                                            </div>
+                                            <label class="col-sm-6 col-form-label text-left">วัน</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">ระยะเวลาสูงสุดในการยืม</label>
+                                    <div class="col-sm-8">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input class="form-control" type="text" asp-for="MaxBorrow" >
+                                                @Html.ValidationMessageFor(m => m.MaxBorrow)
+
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <select class="form-control" asp-for="PeriodType">
+                                                    <option value="@PeriodType.Day" selected>วัน</option>
+                                                    <option value="@PeriodType.Month">เดือน</option>
+                                                    <option value="@PeriodType.Year">ปี</option>
+                                                </select>
+                                                @Html.ValidationMessageFor(m => m.PeriodType)
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right">สถานะ</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" asp-for="Status">
+                                            <option value="@Status.Enable">@Status.Enable.toStatusName()</option>
+                                            <option value="@Status.Disable">@Status.Disable.toStatusName()</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(m => m.Status)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label text-right"></label>
+                                    <div class="col-sm-8">
+                                        <button class="btn btn-primary " type="submit">บันทึก</button>
+                                        <a href="@Url.Action("Program","System")" class="btn btn-light">กลับ</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- end card-body -->
+                </div> <!-- end card -->
+            </div> <!-- end col -->
+            <!-- end col -->
+        </div> <!-- end row -->
+    </form>
+
+
+</div><!-- container -->
